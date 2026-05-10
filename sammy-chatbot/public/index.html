@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>chat with sammy 🎀</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: #fff5fd; }
+
+    .intro { position: fixed; inset: 0; background: #fde8f5; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.6s ease; }
+    .intro.hide { opacity: 0; pointer-events: none; }
+    .heart { font-size: 80px; animation: heartbeat 0.7s ease-in-out infinite alternate; }
+    @keyframes heartbeat { 0%{transform:scale(1);} 100%{transform:scale(1.18);} }
+    .face-reveal { margin-top: 24px; width: 140px; height: 140px; border-radius: 50%; border: 4px solid #f472b6; box-shadow: 0 0 0 6px #fce7f3, 0 0 30px #f9a8d488; overflow: hidden; opacity: 0; transform: scale(0.5); transition: all 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+    .face-reveal.show { opacity: 1; transform: scale(1); }
+    .face-reveal img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+    .intro-text { margin-top: 18px; font-family: 'Playfair Display', serif; font-style: italic; font-size: 20px; color: #be185d; text-align: center; opacity: 0; transform: translateY(10px); transition: all 0.5s ease 0.3s; }
+    .intro-text.show { opacity: 1; transform: translateY(0); }
+    .intro-text strong { font-style: normal; color: #7c3aed; }
+    .intro-btn { margin-top: 20px; background: #f472b6; border: none; border-radius: 20px; padding: 12px 28px; color: white; font-weight: 800; font-size: 15px; cursor: pointer; font-family: 'Nunito', sans-serif; opacity: 0; transition: opacity 0.4s ease 0.6s; box-shadow: 0 4px 14px #f472b644; }
+    .intro-btn.show { opacity: 1; }
+
+    .app { min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .banner { width: 100%; position: relative; overflow: hidden; background: #fde8f5; height: 220px; flex-shrink: 0; }
+    .streamer { position: absolute; top: 0; width: 5px; border-radius: 3px; height: 100%; opacity: 0.35; animation: sway var(--s,3s) ease-in-out infinite var(--sv,0s); transform-origin: top center; }
+    @keyframes sway { 0%,100%{transform:rotate(-5deg);} 50%{transform:rotate(5deg);} }
+    .gstar { position: absolute; animation: gtwinkle var(--gt,2s) ease-in-out infinite var(--gd,0s); font-size: 17px; }
+    @keyframes gtwinkle { 0%,100%{transform:scale(0.85) rotate(-12deg);opacity:0.7;} 50%{transform:scale(1.2) rotate(12deg);opacity:1;} }
+    .banner-inner { position: absolute; bottom: 20px; left: 0; right: 0; display: flex; align-items: flex-end; justify-content: center; gap: 16px; z-index: 2; }
+    .sammy-img { height: 170px; width: auto; object-fit: contain; object-position: top; filter: drop-shadow(1px 3px 4px rgba(220,100,180,0.2)); flex-shrink: 0; }
+    .center-col { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-bottom: 6px; }
+    .disco-ball { width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0%, #dce8f8 45%, #9ab8d8 100%); overflow: hidden; position: relative; box-shadow: inset -6px -6px 14px rgba(0,0,0,0.2), inset 4px 4px 8px rgba(255,255,255,0.75); }
+    .tile { position: absolute; border-radius: 1px; animation: tileshine var(--ts,2s) ease-in-out infinite var(--td,0s); }
+    @keyframes tileshine { 0%,100%{opacity:0.2;} 50%{opacity:1;} }
+    .disco-shine { position: absolute; border-radius: 50%; background: white; opacity: 0; animation: dshine 2.8s ease-in-out infinite var(--ds,0s); }
+    @keyframes dshine { 0%,100%{opacity:0;} 45%{opacity:0.85;} }
+    .speech-bubble { background: white; border: 2.5px solid #f472b6; border-radius: 24px 24px 24px 4px; padding: 12px 22px; box-shadow: 4px 4px 0 #fbb6e0; position: relative; }
+    .speech-bubble::before { content: ''; position: absolute; left: -14px; top: 50%; transform: translateY(-50%); border: 7px solid transparent; border-right-color: #f472b6; }
+    .speech-bubble::after { content: ''; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: white; }
+    .bubble-text { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 15px; color: #be185d; white-space: nowrap; }
+    .bubble-text strong { font-style: normal; font-weight: 700; color: #7c3aed; }
+    .bow { position: absolute; bottom: 14px; right: 18px; font-size: 22px; animation: floatEl 3.2s ease-in-out infinite 0.5s; }
+    @keyframes floatEl { 0%,100%{transform:translateY(0) rotate(-6deg);} 50%{transform:translateY(-7px) rotate(6deg);} }
+
+    .chat-wrap { width: 100%; max-width: 600px; padding: 16px; flex: 1; display: flex; flex-direction: column; }
+    .chat-box { background: white; border-radius: 20px; border: 2px solid #f0abcf; box-shadow: 4px 4px 0 #fce7f3; display: flex; flex-direction: column; overflow: hidden; }
+    .messages { height: 320px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .msg { display: flex; gap: 8px; align-items: flex-end; }
+    .msg.user { flex-direction: row-reverse; }
+    .bubble2 { max-width: 75%; padding: 10px 14px; font-size: 14px; line-height: 1.5; }
+    .msg.sammy .bubble2 { background: #fdf2f8; border: 1.5px solid #f0abcf; color: #7c3aed; border-radius: 18px 18px 18px 4px; }
+    .msg.tommy .bubble2 { background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; border-radius: 18px 18px 18px 4px; font-style: italic; }
+    .msg.user .bubble2 { background: #f5f3ff; border: 1.5px solid #c4b5fd; color: #4c1d95; border-radius: 18px 18px 4px 18px; }
+    .msg-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .sammy-av { background: linear-gradient(135deg, #f9a8d4, #c4b5fd); }
+    .tommy-av { background: linear-gradient(135deg, #86efac, #6ee7b7); }
+    .user-av { background: linear-gradient(135deg, #c4b5fd, #93c5fd); }
+    .typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #f0abcf; animation: bounce 1s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-5px);} }
+    .quick-btns { display: flex; gap: 7px; padding: 0 14px 10px; flex-wrap: wrap; }
+    .qbtn { background: #fdf2f8; border: 1.5px solid #f0abcf; border-radius: 20px; padding: 6px 12px; font-size: 11px; color: #be185d; cursor: pointer; font-weight: 700; font-family: 'Nunito', sans-serif; white-space: nowrap; }
+    .qbtn:hover { background: #fce7f3; }
+    .qbtn.green { background: #f0fdf4; border-color: #86efac; color: #166534; }
+    .qbtn.green:hover { background: #dcfce7; }
+    .input-row { display: flex; gap: 8px; padding: 12px 14px; border-top: 2px solid #fce7f3; background: #fff9fe; }
+    .input-row input { flex: 1; border: 1.5px solid #f0abcf; border-radius: 20px; padding: 10px 16px; font-size: 14px; font-family: 'Nunito', sans-serif; outline: none; color: #4c1d95; background: white; }
+    .input-row button { background: #f472b6; border: none; border-radius: 20px; padding: 10px 18px; color: white; font-weight: 700; font-size: 14px; cursor: pointer; font-family: 'Nunito', sans-serif; transition: opacity 0.2s; }
+    .input-row button:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<div class="intro" id="intro">
+  <div class="heart">💗</div>
+  <div class="face-reveal" id="face">
+    <img src="sammy.png" alt="sammy"/>
+  </div>
+  <div class="intro-text" id="intro-text">it's me. <strong>sammy.</strong><br/>god's gift to your life 🙂</div>
+  <button class="intro-btn" id="intro-btn" onclick="enterChat()">ok fine, let's chat 🫵</button>
+</div>
+
+<div class="app">
+  <div class="banner" id="banner">
+    <svg style="position:absolute;top:0;left:0;width:100%;height:48px;" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,18 Q22,42 44,18 Q66,42 88,18 Q110,42 132,18 Q154,42 176,18 Q198,42 220,18 Q242,42 264,18 Q286,42 308,18 Q330,42 352,18 Q374,42 396,18 Q418,42 440,18 Q462,42 484,18 Q506,42 528,18 Q550,42 572,18 Q594,42 616,18 Q638,42 660,18 Q682,42 704,18 Q726,42 748,18 Q770,42 792,18 Q814,42 836,18 Q858,42 880,18 Q902,42 924,18 Q946,42 968,18 Q990,42 1012,18 Q1034,42 1056,18 Q1078,42 1100,18" fill="#fce4f0" stroke="#f0abcf" stroke-width="1.5"/>
+    </svg>
+    <div id="gstars"></div>
+    <div class="banner-inner">
+      <img src="sammy.png" class="sammy-img" alt="sammy"/>
+      <div class="center-col">
+        <div class="disco-ball" id="discoball">
+          <div class="disco-shine" style="width:14px;height:14px;top:8px;left:10px;"></div>
+          <div class="disco-shine" style="width:9px;height:9px;top:18px;left:34px;animation-delay:1.1s;"></div>
+        </div>
+        <div class="speech-bubble">
+          <div class="bubble-text">god gave you me as a sister. <strong>you're welcome.</strong> 🙂</div>
+        </div>
+      </div>
+    </div>
+    <div class="bow">🎀</div>
+  </div>
+
+  <div class="chat-wrap">
+    <div class="chat-box">
+      <div class="messages" id="messages"></div>
+      <div class="quick-btns">
+        <div class="qbtn green" onclick="quick('let me talk to Tommy')">🐒 talk to tommy</div>
+        <div class="qbtn" onclick="quick('how is Lunis doing')">👶 lunis</div>
+        <div class="qbtn" onclick="quick('come to the mall with me')">🛍️ mall</div>
+        <div class="qbtn" onclick="quick('make me food please')">🍕 make me food</div>
+        <div class="qbtn" onclick="quick('can you give me money')">💸 give me money</div>
+        <div class="qbtn" onclick="quick('how is your knee')">🦵 your knee</div>
+        <div class="qbtn" onclick="quick('do better')">😤 do better</div>
+      </div>
+      <div class="input-row">
+        <input id="input" placeholder="talk to me 🫵 i dare you" onkeydown="if(event.key==='Enter')send()"/>
+        <button id="send-btn" onclick="send()">send 🙂</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let history = [], loading = false;
+
+  function addMsg(role, text) {
+    const msgs = document.getElementById('messages');
+    if (role === 'assistant' && text.includes('Tommy:')) {
+      text.split('\n').forEach(line => {
+        const isTommy = line.trim().startsWith('Tommy:');
+        const clean = line.replace('Tommy:', '').trim();
+        if (!clean) return;
+        const div = document.createElement('div');
+        div.className = `msg ${isTommy ? 'tommy' : 'sammy'}`;
+        div.innerHTML = `<div class="msg-av ${isTommy?'tommy-av':'sammy-av'}">${isTommy?'🐒':'👸'}</div><div class="bubble2">${isTommy?'🐒 '+clean:clean}</div>`;
+        msgs.appendChild(div);
+      });
+    } else {
+      const div = document.createElement('div');
+      div.className = `msg ${role === 'assistant' ? 'sammy' : 'user'}`;
+      div.innerHTML = `<div class="msg-av ${role==='assistant'?'sammy-av':'user-av'}">${role==='assistant'?'👸':'🙂'}</div><div class="bubble2">${text}</div>`;
+      msgs.appendChild(div);
+    }
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTyping() {
+    const msgs = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'msg sammy'; div.id = 'typing';
+    div.innerHTML = `<div class="msg-av sammy-av">👸</div><div class="bubble2 typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  async function send() {
+    const inp = document.getElementById('input');
+    const msg = inp.value.trim();
+    if (!msg || loading) return;
+    inp.value = ''; loading = true;
+    document.getElementById('send-btn').disabled = true;
+    addMsg('user', msg); showTyping();
+    history.push({ role: 'user', content: msg });
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history })
+      });
+      const data = await res.json();
+      const reply = data.reply || "No";
+      document.getElementById('typing')?.remove();
+      addMsg('assistant', reply);
+      history.push({ role: 'assistant', content: reply });
+    } catch {
+      document.getElementById('typing')?.remove();
+      addMsg('assistant', "something broke. ask Lunis. she's not doing anything anyway.");
+    }
+    loading = false; document.getElementById('send-btn').disabled = false;
+  }
+
+  async function quick(msg) {
+    document.getElementById('input').value = msg;
+    await send();
+  }
+
+  function enterChat() {
+    document.getElementById('intro').classList.add('hide');
+    setTimeout(() => {
+      document.getElementById('intro').style.display = 'none';
+      addMsg('assistant', "god gave you me as a sister. you're welcome. tell Lunis i said do better. now what do you want 🙂");
+    }, 600);
+  }
+
+  setTimeout(() => document.getElementById('face').classList.add('show'), 800);
+  setTimeout(() => document.getElementById('intro-text').classList.add('show'), 1400);
+  setTimeout(() => document.getElementById('intro-btn').classList.add('show'), 1800);
+
+  const colors = ['#f9a8d4','#c4b5fd','#fcd34d','#6ee7b7','#93c5fd','#f0abcf','#ddd6fe','#fde68a'];
+  const banner = document.getElementById('banner');
+  for (let i=0;i<20;i++) {
+    const s = document.createElement('div'); s.className = 'streamer';
+    s.style.cssText = `left:${(i/19)*100}%;background:${colors[i%colors.length]};--s:${2+Math.random()*2}s;--sv:${Math.random()*2}s;`;
+    banner.appendChild(s);
+  }
+  const gs = document.getElementById('gstars');
+  ['⭐','✦','🌟','✧','⭐','✦','🌟','✧','⭐','✦','🌟','✧','⭐','✦','⭐','✦','🌟','✧'].forEach((e,i,a) => {
+    const el = document.createElement('span'); el.className = 'gstar';
+    el.style.cssText = `left:${(i/(a.length-1))*97+1}%;top:${Math.sin(i*0.72)*12+14}px;--gt:${1.8+Math.random()*1.4}s;--gd:${Math.random()*2}s;`;
+    el.textContent = e; gs.appendChild(el);
+  });
+  const db = document.getElementById('discoball');
+  const tc = ['#e8eef8','#c8d8f0','#f0f6ff','#d8e8f8','#ffffff','#b8cce8'];
+  for (let r=0;r<5;r++) for (let c=0;c<4;c++) {
+    const t = document.createElement('div'); t.className = 'tile';
+    t.style.cssText = `width:10px;height:8px;left:${c*13+3}px;top:${r*11+4}px;background:${tc[Math.floor(Math.random()*tc.length)]};--ts:${1.4+Math.random()*2}s;--td:${Math.random()*3}s;`;
+    db.appendChild(t);
+  }
+</script>
+</body>
+</html>
