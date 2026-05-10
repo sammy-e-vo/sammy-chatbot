@@ -20,4 +20,4 @@ a chatbot of sammy for her sister. chaos ensues.
 - `public/sammy.png` — add your cutout photo here!
 
 ## note
-add your `sammy.png` photo to the `public/` folder before deploying!
+add your `sammy.png` photo to the `public/` folder before deploying! 
